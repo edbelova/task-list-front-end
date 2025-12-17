@@ -17,24 +17,20 @@ const TASKS = [
 
 
 const App = () => {
-  // const [complete, setComplete] = useState(false);
   const [tasks, setTasks] = useState(TASKS);
   const handleToggleComplete = (taskId) => {
     setTasks(TASKS => {
       return TASKS.map(task => {
-        if (taskId === task.id) {
-          return {
-            ...task, isComplete: !task.isComplete
-          };
-        } else {
-          return task;
-        };
+        return (taskId === task.id) ? {
+          ...task, isComplete: !task.isComplete
+        } : task;
       });
     });
   };
-  const handDeleteTask =(taskId)=>{
+
+  const handleDeleteTask = (taskId) => {
     setTasks(TASKS => {
-      return TASKS.filter(task=>task.id !== taskId);
+      return TASKS.filter(task => task.id !== taskId);
     });
   };
   return (
@@ -43,7 +39,11 @@ const App = () => {
         <h1>Ada&apos;s Task List</h1>
       </header>
       <main>
-        <div>{<TaskList tasks={tasks} onToggleComplete={handleToggleComplete} handDeleteTask={handDeleteTask} />}</div>
+        <div>{<TaskList tasks={tasks}
+          onToggleComplete={handleToggleComplete}
+          handleDeleteTask={handleDeleteTask}
+        />}
+        </div>
       </main>
     </div>
   );
