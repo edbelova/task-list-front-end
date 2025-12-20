@@ -1,6 +1,7 @@
 import TaskList from './components/TaskList.jsx';
 import './App.css';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import axios from 'axios';
 
 const TASKS = [
   {
@@ -15,23 +16,67 @@ const TASKS = [
   },
 ];
 
+const kbaseURL = 'http://127.0.0.1:5000';
+const getAllTasksAPI = () => {
+  return axios.get(`${kbaseURL}/tasks`)
+    .then(response => response.data)
+    .catch(error => console.log(error));
+};
+
+const convertFromAPI = (apiTask) => {
+  const newTask = {
+    ...apiTask,
+    isComplete: apiTask.is_complete ? apiTask.is_complete : false,
+  };
+  delete newTask.is_complete;
+  return newTask;
+};
+
+/*need refactor */
+const toggleCompleteApi = (id, markComplete) => {
+  const endpoint = markComplete ? 'mark_complete' : 'mark_incomplete';
+  return axios.patch(`${kbaseURL}/tasks/${id}/${endpoint}`)
+    .then(() => {
+      return getAllTasksAPI();
+    })
+    .catch(error => console.log(error));
+};
+
+const deleteTaskApi = (id) => {
+  return axios.delete(`${kbaseURL}/tasks/${id}`)
+    .catch(error => console.log(error));
+};
 
 const App = () => {
   const [tasks, setTasks] = useState(TASKS);
-  const handleToggleComplete = (taskId) => {
-    setTasks(TASKS => {
-      return TASKS.map(task => {
-        return (taskId === task.id) ? {
-          ...task, isComplete: !task.isComplete
-        } : task;
+  const getAllTasks = () => {
+    return getAllTasksAPI()
+      .then(tasks => {
+        const newTasks = tasks.map(convertFromAPI);
+        setTasks(newTasks);
       });
-    });
+  };
+  useEffect(() => {
+    getAllTasks();
+  }, []);
+
+  const handleToggleComplete = (taskId) => {
+    const currentTask = tasks.find(task => task.id === taskId);
+    const newIsComplete = !currentTask.isComplete;
+    toggleCompleteApi(taskId, newIsComplete)
+      .then(response => {
+        const newTasks = response.map(convertFromAPI);
+        setTasks(newTasks);
+      });
   };
 
   const handleDeleteTask = (taskId) => {
-    setTasks(TASKS => {
-      return TASKS.filter(task => task.id !== taskId);
-    });
+    return deleteTaskApi(taskId)
+      .then(() => {
+        return setTasks(TASKS => {
+          return TASKS.filter(task => task.id !== taskId);
+        });
+      });
   };
   return (
     <div className="App">
