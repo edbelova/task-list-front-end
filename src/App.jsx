@@ -1,20 +1,21 @@
 import TaskList from './components/TaskList.jsx';
+import NewTaskForm from './components/NewTaskForm.jsx';
 import './App.css';
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 
-const TASKS = [
-  {
-    id: 1,
-    title: 'Mow the lawn',
-    isComplete: false,
-  },
-  {
-    id: 2,
-    title: 'Cook Pasta',
-    isComplete: true,
-  },
-];
+// const TASKS = [
+//   {
+//     id: 1,
+//     title: 'Mow the lawn',
+//     isComplete: false,
+//   },
+//   {
+//     id: 2,
+//     title: 'Cook Pasta',
+//     isComplete: true,
+//   },
+// ];
 
 const kbaseURL = 'http://127.0.0.1:5000';
 const getAllTasksAPI = () => {
@@ -47,6 +48,25 @@ const deleteTaskApi = (id) => {
     .catch(error => console.log(error));
 };
 
+const addTaskApi = (newData) => {
+  const { title, isComplete } = newData;
+
+  const completedAt = isComplete === 'true' ? new Date() : null;
+  const description = 'Test Description';
+
+  return axios.post(`${kbaseURL}/tasks`, {
+    title,
+    description,
+    'completed_at': completedAt
+  })
+    .then(response => response.data)
+    .catch(error => {
+      console.log(error);
+      throw error;
+    });
+};
+
+
 const App = () => {
   const [tasks, setTasks] = useState([]);
   const getAllTasks = () => {
@@ -54,6 +74,10 @@ const App = () => {
       .then(tasks => {
         const newTasks = tasks.map(convertFromAPI);
         setTasks(newTasks);
+      })
+      .catch(error => {
+        console.log(error);
+        throw error;
       });
   };
   useEffect(() => {
@@ -67,16 +91,29 @@ const App = () => {
       .then(response => {
         const newTasks = response.map(convertFromAPI);
         setTasks(newTasks);
+      })
+      .catch(error => {
+        console.log(error);
+        throw error;
       });
   };
 
   const handleDeleteTask = (taskId) => {
     return deleteTaskApi(taskId)
       .then(() => {
-        return setTasks(TASKS => {
+        setTasks(TASKS => {
           return TASKS.filter(task => task.id !== taskId);
         });
-      });
+      })
+      .catch(error => console.log(error));
+  };
+  const handleAddNewTask = (newData) => {
+    addTaskApi(newData)
+      .then(response => {
+        const convertedNewTask = convertFromAPI(response);
+        setTasks([...tasks, convertedNewTask]);
+      })
+      .catch(error => console.log(error));
   };
   return (
     <div className="App">
@@ -88,6 +125,9 @@ const App = () => {
           onToggleComplete={handleToggleComplete}
           handleDeleteTask={handleDeleteTask}
         />}
+        </div>
+        <div>
+          <NewTaskForm onAddNewTask={handleAddNewTask}></NewTaskForm>
         </div>
       </main>
     </div>
