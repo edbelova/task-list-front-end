@@ -48,7 +48,7 @@ const deleteTaskApi = (id) => {
 };
 
 const App = () => {
-  const [tasks, setTasks] = useState(TASKS);
+  const [tasks, setTasks] = useState([]);
   const getAllTasks = () => {
     return getAllTasksAPI()
       .then(tasks => {
