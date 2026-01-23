@@ -33,7 +33,6 @@ const convertFromAPI = (apiTask) => {
   return newTask;
 };
 
-/*need refactor */
 const toggleCompleteApi = (id, markComplete) => {
   const endpoint = markComplete ? 'mark_complete' : 'mark_incomplete';
   return axios.patch(`${kbaseURL}/tasks/${id}/${endpoint}`)
@@ -65,7 +64,6 @@ const addTaskApi = (newData) => {
       throw error;
     });
 };
-
 
 const App = () => {
   const [tasks, setTasks] = useState([]);

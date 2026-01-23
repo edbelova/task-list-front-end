@@ -12,7 +12,7 @@ const TaskList = ({ tasks, onToggleComplete,handleDeleteTask}) => {
           title={task.title}
           isComplete={task.isComplete}
           onToggleComplete={onToggleComplete}
-          onDeleteTask={handleDeleteTask}
+          handleDeleteTask={handleDeleteTask}
         />
       );
     });

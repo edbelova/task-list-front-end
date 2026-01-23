@@ -7,8 +7,6 @@ const kDefaultsFormState = {
   isComplete: 'false',
 };
 
-
-
 const NewTaskForm = ({ onAddNewTask }) => {
   const [formData, setFormData] = useState(kDefaultsFormState);
   const handleChange = (event) => {
